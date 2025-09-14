@@ -30,10 +30,6 @@ jobs:
   deploy-network:
     needs: [ deploy-auth ]
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        region: [ us-east-2 ]
-    environment: ${{ matrix.region }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -43,6 +39,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: ${{ github.run_id }}
-          aws-region: ${{ matrix.region }}
+          aws-region: us-east-2
       - run: npm ci
       - run: npm run cdk deploy TSCSDemoNetwork
