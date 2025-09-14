@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
@@ -28,7 +29,17 @@ export class TailscaleNetworkStack extends cdk.Stack {
 
         vpc.addGatewayEndpoint('S3Endpoint', {
             service: ec2.GatewayVpcEndpointAwsService.S3
-        });
+        }).addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            principals: [new iam.AnyPrincipal()],
+            actions: ['*'],
+            resources: ['*'],
+            conditions: {
+                StringEquals: {
+                    'aws:ResourceAccount': props?.env?.account
+                }
+            }
+        }));
 
         vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
             service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
@@ -36,7 +47,17 @@ export class TailscaleNetworkStack extends cdk.Stack {
             subnets: {
                 subnetType: ec2.SubnetType.PRIVATE_ISOLATED
             }
-        });
+        }).addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            principals: [new iam.AnyPrincipal()],
+            actions: ['*'],
+            resources: ['*'],
+            conditions: {
+                StringEquals: {
+                    'aws:ResourceAccount': props?.env?.account
+                }
+            }
+        }));
 
         vpc.addInterfaceEndpoint('SQSEndpoint', {
             service: ec2.InterfaceVpcEndpointAwsService.SQS,
@@ -44,7 +65,17 @@ export class TailscaleNetworkStack extends cdk.Stack {
             subnets: {
                 subnetType: ec2.SubnetType.PRIVATE_ISOLATED
             }
-        });
+        }).addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            principals: [new iam.AnyPrincipal()],
+            actions: ['*'],
+            resources: ['*'],
+            conditions: {
+                StringEquals: {
+                    'aws:ResourceAccount': props?.env?.account
+                }
+            }
+        }));
 
         const ecsCluster = new ecs.Cluster(this, 'Cluster', {
             vpc: vpc,
