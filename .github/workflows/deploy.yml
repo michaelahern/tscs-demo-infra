@@ -30,6 +30,7 @@ jobs:
   deploy-network:
     needs: [ deploy-auth ]
     runs-on: ubuntu-latest
+    environment: network
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
