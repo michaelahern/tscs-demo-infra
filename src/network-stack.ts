@@ -26,6 +26,26 @@ export class TailscaleNetworkStack extends cdk.Stack {
             ]
         });
 
+        vpc.addGatewayEndpoint('S3Endpoint', {
+            service: ec2.GatewayVpcEndpointAwsService.S3
+        });
+
+        vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
+            service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+            privateDnsEnabled: true,
+            subnets: {
+                subnetType: ec2.SubnetType.PRIVATE_ISOLATED
+            }
+        });
+
+        vpc.addInterfaceEndpoint('SQSEndpoint', {
+            service: ec2.InterfaceVpcEndpointAwsService.SQS,
+            privateDnsEnabled: true,
+            subnets: {
+                subnetType: ec2.SubnetType.PRIVATE_ISOLATED
+            }
+        });
+
         const ecsCluster = new ecs.Cluster(this, 'Cluster', {
             vpc: vpc,
             containerInsightsV2: ecs.ContainerInsights.ENHANCED
@@ -44,9 +64,8 @@ export class TailscaleNetworkStack extends cdk.Stack {
             image: ecs.ContainerImage.fromRegistry('ghcr.io/tailscale/tailscale:latest'),
             environment: {
                 TS_ENABLE_HEALTH_CHECK: 'true',
-                // TS_EXTRA_ARGS: '--advertise-exit-node --advertise-tags=tag:tscs-demo',
-                TS_HOSTNAME: `tscs-demo-${this.region}`
-                // TS_ROUTES: '172.24.0.0/16'
+                TS_HOSTNAME: `tscs-demo-${this.region}`,
+                TS_ROUTES: '172.24.0.0/16,16.12.60.0/22,16.12.64.0/22,18.34.252.0/22,18.34.72.0/21,3.5.128.0/22,3.5.132.0/23,52.219.141.0/24,52.219.142.0/23,52.219.176.0/22,52.219.212.0/22,52.219.224.0/21,52.219.232.0/22,52.219.80.0/20,52.219.96.0/20'
             },
             secrets: {
                 TS_AUTH_KEY: ecs.Secret.fromSecretsManager(secretsmanager.Secret.fromSecretNameV2(this, 'TailscaleAuthKey', 'tailscale/tscs-demo-auth-key'))
