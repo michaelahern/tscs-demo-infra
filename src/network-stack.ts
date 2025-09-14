@@ -34,6 +34,7 @@ export class TailscaleNetworkStack extends cdk.Stack {
 
         this.dynamoDbEndpoint = this.vpc.addInterfaceEndpoint('DynamoDBEndpoint', {
             service: ec2.InterfaceVpcEndpointAwsService.DYNAMODB,
+            privateDnsEnabled: false,
             subnets: {
                 subnetType: ec2.SubnetType.PRIVATE_ISOLATED
             }
