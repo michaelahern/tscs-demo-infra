@@ -6,10 +6,15 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
 export class TailscaleNetworkStack extends cdk.Stack {
+    public readonly dynamoDbEndpoint: ec2.InterfaceVpcEndpoint;
+    public readonly kmsEndpoint: ec2.InterfaceVpcEndpoint;
+    public readonly s3Endpoint: ec2.GatewayVpcEndpoint;
+    public readonly vpc: ec2.Vpc;
+
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const vpc = new ec2.Vpc(this, 'VPC', {
+        this.vpc = new ec2.Vpc(this, 'VPC', {
             ipAddresses: ec2.IpAddresses.cidr('172.24.0.0/16'),
             maxAzs: 3,
             natGateways: 0,
@@ -27,9 +32,14 @@ export class TailscaleNetworkStack extends cdk.Stack {
             ]
         });
 
-        vpc.addGatewayEndpoint('S3Endpoint', {
-            service: ec2.GatewayVpcEndpointAwsService.S3
-        }).addToPolicy(new iam.PolicyStatement({
+        this.dynamoDbEndpoint = this.vpc.addInterfaceEndpoint('DynamoDBEndpoint', {
+            service: ec2.InterfaceVpcEndpointAwsService.DYNAMODB,
+            subnets: {
+                subnetType: ec2.SubnetType.PRIVATE_ISOLATED
+            }
+        });
+
+        this.dynamoDbEndpoint.addToPolicy(new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
             principals: [new iam.AnyPrincipal()],
             actions: ['*'],
@@ -41,13 +51,31 @@ export class TailscaleNetworkStack extends cdk.Stack {
             }
         }));
 
-        vpc.addInterfaceEndpoint('DynamoDBEndpoint', {
-            service: ec2.InterfaceVpcEndpointAwsService.DYNAMODB,
+        this.kmsEndpoint = this.vpc.addInterfaceEndpoint('KMSEndpoint', {
+            service: ec2.InterfaceVpcEndpointAwsService.KMS,
             privateDnsEnabled: true,
             subnets: {
                 subnetType: ec2.SubnetType.PRIVATE_ISOLATED
             }
-        }).addToPolicy(new iam.PolicyStatement({
+        });
+
+        this.kmsEndpoint.addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            principals: [new iam.AnyPrincipal()],
+            actions: ['*'],
+            resources: ['*'],
+            conditions: {
+                StringEquals: {
+                    'aws:ResourceAccount': props?.env?.account
+                }
+            }
+        }));
+
+        this.s3Endpoint = this.vpc.addGatewayEndpoint('S3Endpoint', {
+            service: ec2.GatewayVpcEndpointAwsService.S3
+        });
+
+        this.s3Endpoint.addToPolicy(new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
             principals: [new iam.AnyPrincipal()],
             actions: ['*'],
@@ -60,7 +88,7 @@ export class TailscaleNetworkStack extends cdk.Stack {
         }));
 
         const ecsCluster = new ecs.Cluster(this, 'Cluster', {
-            vpc: vpc,
+            vpc: this.vpc,
             containerInsightsV2: ecs.ContainerInsights.ENHANCED
         });
 

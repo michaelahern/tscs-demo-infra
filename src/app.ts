@@ -9,10 +9,10 @@ new TailscaleAuthKeyStack(app, 'TSCSDemoAuthKey', {
     env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
 });
 
-new TailscaleNetworkStack(app, 'TSCSDemoNetwork', {
+const networkStack = new TailscaleNetworkStack(app, 'TSCSDemoNetwork', {
     env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
 });
 
-new TailscaleResourcesStack(app, 'TSCSDemoResources', {
+new TailscaleResourcesStack(app, 'TSCSDemoResources', networkStack, {
     env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
 });
