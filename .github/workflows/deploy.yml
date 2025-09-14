@@ -43,3 +43,19 @@ jobs:
           aws-region: us-east-2
       - run: npm ci
       - run: npm run cdk deploy TSCSDemoNetwork
+  deploy-resources:
+    needs: [ deploy-auth ]
+    runs-on: ubuntu-latest
+    environment: resources
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.x
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: ${{ github.run_id }}
+          aws-region: us-east-2
+      - run: npm ci
+      - run: npm run cdk deploy TSCSDemoResources
