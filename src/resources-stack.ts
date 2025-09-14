@@ -24,9 +24,7 @@ export class TailscaleResourcesStack extends cdk.Stack {
                         effect: iam.Effect.DENY,
                         principals: [new iam.AnyPrincipal()],
                         actions: [
-                            'dynamodb:PutItem',
-                            'dynamodb:UpdateItem',
-                            'dynamodb:DeleteItem'
+                            'dynamodb:PutItem'
                         ],
                         resources: ['*'],
                         conditions: {
@@ -73,9 +71,23 @@ export class TailscaleResourcesStack extends cdk.Stack {
 
         new s3.Bucket(this, 'S3Bucket', {
             bucketName: `tscs-demo-bucket-${this.account}-${this.region}`,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
             blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
             encryption: s3.BucketEncryption.KMS_MANAGED,
-            enforceSSL: true
-        });
+            enforceSSL: true,
+            minimumTLSVersion: 1.2
+        }).addToResourcePolicy(new iam.PolicyStatement({
+            effect: iam.Effect.DENY,
+            principals: [new iam.AnyPrincipal()],
+            actions: [
+                's3:PutObject'
+            ],
+            resources: [`arn:aws:s3:::tscs-demo-bucket-${this.account}-${this.region}/*`],
+            conditions: {
+                StringNotEquals: {
+                    'aws:sourceVpce': networkStack.s3Endpoint.vpcEndpointId
+                }
+            }
+        }));
     }
 }
