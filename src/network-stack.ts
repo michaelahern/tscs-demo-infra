@@ -41,26 +41,8 @@ export class TailscaleNetworkStack extends cdk.Stack {
             }
         }));
 
-        vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
-            service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
-            privateDnsEnabled: true,
-            subnets: {
-                subnetType: ec2.SubnetType.PRIVATE_ISOLATED
-            }
-        }).addToPolicy(new iam.PolicyStatement({
-            effect: iam.Effect.ALLOW,
-            principals: [new iam.AnyPrincipal()],
-            actions: ['*'],
-            resources: ['*'],
-            conditions: {
-                StringEquals: {
-                    'aws:ResourceAccount': props?.env?.account
-                }
-            }
-        }));
-
-        vpc.addInterfaceEndpoint('SQSEndpoint', {
-            service: ec2.InterfaceVpcEndpointAwsService.SQS,
+        vpc.addInterfaceEndpoint('DynamoDBEndpoint', {
+            service: ec2.InterfaceVpcEndpointAwsService.DYNAMODB,
             privateDnsEnabled: true,
             subnets: {
                 subnetType: ec2.SubnetType.PRIVATE_ISOLATED
