@@ -27,7 +27,7 @@ jobs:
       - run: aws secretsmanager put-secret-value --secret-id tailscale/tscs-demo-auth-key --secret-string "$TS_AUTHKEY"
         env:
           TS_AUTHKEY: ${{ secrets.TS_AUTHKEY }}
-  deploy-router:
+  deploy-network:
     needs: [ deploy-auth ]
     runs-on: ubuntu-latest
     strategy:
