@@ -22,35 +22,7 @@ jobs:
           role-session-name: ${{ github.run_id }}
           aws-region: us-east-2
       - run: npm ci
-      - run: npm run cdk diff TailscaleAuthKey
-  diff-policy:
-    if: github.actor != 'dependabot[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: tailscale/gitops-acl-action@v1
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tailnet: ${{ secrets.TS_TAILNET }}
-          action: test
-  diff-exit:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        region: [ us-east-1, us-west-2 ]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: ${{ github.run_id }}
-          aws-region: ${{ matrix.region }}
-      - run: npm ci
-      - run: npm run cdk diff TailscaleExitNode
+      - run: npm run cdk diff TSCSDemoAuthKey
   diff-router:
     runs-on: ubuntu-latest
     strategy:
@@ -67,4 +39,4 @@ jobs:
           role-session-name: ${{ github.run_id }}
           aws-region: ${{ matrix.region }}
       - run: npm ci
-      - run: npm run cdk diff TailscaleRouterNode
+      - run: npm run cdk diff TSCSDemoNetwork

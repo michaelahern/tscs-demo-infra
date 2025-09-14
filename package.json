@@ -1,0 +1,33 @@
+{
+  "name": "casa-cirrus-tailscale",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npm run lint && tsc",
+    "cdk": "cdk",
+    "clean": "rimraf ./cdk.out ./dist",
+    "lint": "eslint --max-warnings=0",
+    "lint-fix": "eslint --max-warnings=0 --fix"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2",
+    "constructs": "^10"
+  },
+  "devDependencies": {
+    "@eslint/json": "^0",
+    "@eslint/markdown": "^7",
+    "@stylistic/eslint-plugin": "^5",
+    "@types/node": "^22",
+    "aws-cdk": "^2",
+    "eslint": "^9",
+    "eslint-plugin-jsonc": "^2",
+    "eslint-plugin-yml": "^1",
+    "rimraf": "^6",
+    "tsx": "^4",
+    "typescript": "~5.8",
+    "typescript-eslint": "^8"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
