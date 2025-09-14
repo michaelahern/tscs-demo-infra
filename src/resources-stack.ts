@@ -11,12 +11,32 @@ export class TailscaleResourcesStack extends cdk.Stack {
         super(scope, id, props);
 
         new dynamodb.Table(this, 'DynamoDBTable', {
-            tableName: `tscs-demo-table-${this.account}-${this.region}`,
             partitionKey: {
                 name: 'id',
                 type: dynamodb.AttributeType.STRING
             },
-            encryption: dynamodb.TableEncryption.AWS_MANAGED
+            tableName: `tscs-demo-table-${this.account}-${this.region}`,
+            encryption: dynamodb.TableEncryption.AWS_MANAGED,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            resourcePolicy: new iam.PolicyDocument({
+                statements: [
+                    new iam.PolicyStatement({
+                        effect: iam.Effect.DENY,
+                        principals: [new iam.AnyPrincipal()],
+                        actions: [
+                            'dynamodb:PutItem',
+                            'dynamodb:UpdateItem',
+                            'dynamodb:DeleteItem'
+                        ],
+                        resources: ['*'],
+                        conditions: {
+                            StringNotEquals: {
+                                'aws:sourceVpce': networkStack.dynamoDbEndpoint.vpcEndpointId
+                            }
+                        }
+                    })
+                ]
+            })
         });
 
         new kms.Key(this, 'KMSKey', {
