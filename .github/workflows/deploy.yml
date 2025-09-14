@@ -44,7 +44,7 @@ jobs:
       - run: npm ci
       - run: npm run cdk deploy TSCSDemoNetwork
   deploy-resources:
-    needs: [ deploy-auth ]
+    needs: [ deploy-auth, deploy-network ]
     runs-on: ubuntu-latest
     environment: resources
     steps:
