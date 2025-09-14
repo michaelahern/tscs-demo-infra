@@ -20,7 +20,7 @@ export class TailscaleResourcesStack extends cdk.Stack {
         });
 
         new kms.Key(this, 'KMSKey', {
-            alias: `alias/tscs-demo-key-${this.account}-${this.region}`,
+            alias: `tscs-demo-key-${this.account}-${this.region}`,
             policy: new iam.PolicyDocument({
                 statements: [
                     new iam.PolicyStatement({
