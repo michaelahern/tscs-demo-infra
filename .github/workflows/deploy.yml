@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: auth
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22.x
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: ${{ github.run_id }}
@@ -27,7 +27,7 @@ jobs:
       - run: aws secretsmanager put-secret-value --secret-id tailscale/tscs-demo-auth-key --secret-string "$TS_AUTHKEY"
         env:
           TS_AUTHKEY: ${{ secrets.TS_AUTHKEY }}
-  deploy-router:
+  deploy-network:
     needs: [ deploy-auth ]
     runs-on: ubuntu-latest
     strategy:
@@ -35,11 +35,11 @@ jobs:
         region: [ us-east-2 ]
     environment: ${{ matrix.region }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22.x
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: ${{ github.run_id }}

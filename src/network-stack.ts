@@ -9,7 +9,7 @@ export class TailscaleNetworkStack extends cdk.Stack {
         super(scope, id, props);
 
         const vpc = new ec2.Vpc(this, 'VPC', {
-            ipAddresses: ec2.IpAddresses.cidr('172.16.24.0/16'),
+            ipAddresses: ec2.IpAddresses.cidr('172.24.0.0/16'),
             maxAzs: 3,
             natGateways: 0,
             subnetConfiguration: [
@@ -44,12 +44,12 @@ export class TailscaleNetworkStack extends cdk.Stack {
             image: ecs.ContainerImage.fromRegistry('ghcr.io/tailscale/tailscale:latest'),
             environment: {
                 TS_ENABLE_HEALTH_CHECK: 'true',
-                TS_EXTRA_ARGS: '--advertise-exit-node --advertise-tags=tag:casa-cirrus',
-                TS_HOSTNAME: `casa-cirrus-router-${this.region}`,
-                TS_ROUTES: '172.16.24.0/16'
+                // TS_EXTRA_ARGS: '--advertise-exit-node --advertise-tags=tag:tscs-demo',
+                TS_HOSTNAME: `tscs-demo-${this.region}`
+                // TS_ROUTES: '172.24.0.0/16'
             },
             secrets: {
-                TS_AUTH_KEY: ecs.Secret.fromSecretsManager(secretsmanager.Secret.fromSecretNameV2(this, 'TailscaleAuthKey', 'tailscale/casa-cirrus-auth-key'))
+                TS_AUTH_KEY: ecs.Secret.fromSecretsManager(secretsmanager.Secret.fromSecretNameV2(this, 'TailscaleAuthKey', 'tailscale/tscs-demo-auth-key'))
             },
             essential: true,
             healthCheck: {
