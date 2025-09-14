@@ -1,5 +1,5 @@
 {
-  "name": "casa-cirrus-tailscale",
+  "name": "tscs-demo-infra",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

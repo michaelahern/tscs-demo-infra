@@ -12,11 +12,18 @@ export class TailscaleNetworkStack extends cdk.Stack {
             ipAddresses: ec2.IpAddresses.cidr('172.16.24.0/16'),
             maxAzs: 3,
             natGateways: 0,
-            subnetConfiguration: [{
-                cidrMask: 24,
-                name: 'Private',
-                subnetType: ec2.SubnetType.PRIVATE_ISOLATED
-            }]
+            subnetConfiguration: [
+                {
+                    cidrMask: 24,
+                    name: 'Public',
+                    subnetType: ec2.SubnetType.PUBLIC
+                },
+                {
+                    cidrMask: 24,
+                    name: 'PrivateIsolated',
+                    subnetType: ec2.SubnetType.PRIVATE_ISOLATED
+                }
+            ]
         });
 
         const ecsCluster = new ecs.Cluster(this, 'Cluster', {
@@ -78,7 +85,8 @@ export class TailscaleNetworkStack extends cdk.Stack {
                 enable: true
             },
             taskDefinition: ecsTaskDefinition,
-            assignPublicIp: true
+            assignPublicIp: true,
+            vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC }
         });
 
         ecsService.connections.allowInternally(ec2.Port.tcp(9002));
