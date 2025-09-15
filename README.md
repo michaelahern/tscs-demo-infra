@@ -25,4 +25,5 @@ Tailscale Router Node
 Test resources configured with resource policies denying specific actions if aws:SourceVpce is not one of the expected VPC Endpoints configured in the Network Stack.
   * DynamoDB Table
   * KMS Key
+  * RDS Aurora Serverless v2 (Postgres)
   * S3 Bucket

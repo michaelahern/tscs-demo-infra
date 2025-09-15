@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import * as rds from 'aws-cdk-lib/aws-rds';
@@ -70,14 +71,22 @@ export class TailscaleResourcesStack extends cdk.Stack {
             pendingWindow: cdk.Duration.days(7)
         });
 
-        new rds.DatabaseCluster(this, 'AuroraServerless', {
+        const rdsSecurityGroup = new ec2.SecurityGroup(this, 'AuroraClusterSecurityGroup', {
+            vpc: networkStack.vpc,
+            allowAllOutbound: true
+        });
+
+        rdsSecurityGroup.addIngressRule(ec2.Peer.ipv4(networkStack.vpc.vpcCidrBlock), ec2.Port.tcp(5432));
+
+        new rds.DatabaseCluster(this, 'AuroraCluster', {
             engine: rds.DatabaseClusterEngine.auroraPostgres({
                 version: rds.AuroraPostgresEngineVersion.VER_17_5
             }),
-            writer: rds.ClusterInstance.serverlessV2('ServerlessInstance', {}),
+            writer: rds.ClusterInstance.serverlessV2('PrimaryInstance', {}),
             serverlessV2MinCapacity: 0.5,
             serverlessV2MaxCapacity: 1,
             vpc: networkStack.vpc,
+            securityGroups: [rdsSecurityGroup],
             vpcSubnets: {
                 subnetType: cdk.aws_ec2.SubnetType.PRIVATE_ISOLATED
             },
