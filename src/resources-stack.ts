@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
+import * as rds from 'aws-cdk-lib/aws-rds';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { TailscaleNetworkStack } from './network-stack.js';
@@ -67,6 +68,20 @@ export class TailscaleResourcesStack extends cdk.Stack {
             }),
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             pendingWindow: cdk.Duration.days(7)
+        });
+
+        new rds.DatabaseCluster(this, 'AuroraServerless', {
+            engine: rds.DatabaseClusterEngine.auroraPostgres({
+                version: rds.AuroraPostgresEngineVersion.VER_17_5
+            }),
+            writer: rds.ClusterInstance.serverlessV2('ServerlessInstance', {}),
+            serverlessV2MinCapacity: 0.5,
+            serverlessV2MaxCapacity: 1,
+            vpc: networkStack.vpc,
+            vpcSubnets: {
+                subnetType: cdk.aws_ec2.SubnetType.PRIVATE_ISOLATED
+            },
+            removalPolicy: cdk.RemovalPolicy.DESTROY
         });
 
         new s3.Bucket(this, 'S3Bucket', {
