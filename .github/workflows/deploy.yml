@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: auth
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v5
         with:
           node-version: 22.x
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: network
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v5
         with:
           node-version: 22.x
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: resources
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v5
         with:
           node-version: 22.x
