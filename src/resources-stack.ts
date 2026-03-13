@@ -90,7 +90,11 @@ export class TailscaleResourcesStack extends cdk.Stack {
             vpcSubnets: {
                 subnetType: cdk.aws_ec2.SubnetType.PRIVATE_ISOLATED
             },
-            removalPolicy: cdk.RemovalPolicy.DESTROY
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            enableDataApi: true,
+            iamAuthentication: true,
+            databaseInsightsMode: rds.DatabaseInsightsMode.ADVANCED,
+            performanceInsightRetention: rds.PerformanceInsightRetention.MONTHS_15
         });
 
         new s3.Bucket(this, 'S3Bucket', {
