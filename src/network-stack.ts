@@ -8,6 +8,7 @@ import { Construct } from 'constructs';
 export class TailscaleNetworkStack extends cdk.Stack {
     public readonly dynamoDbEndpoint: ec2.InterfaceVpcEndpoint;
     public readonly kmsEndpoint: ec2.InterfaceVpcEndpoint;
+    public readonly secretsManagerEndpoint: ec2.InterfaceVpcEndpoint;
     public readonly s3Endpoint: ec2.GatewayVpcEndpoint;
     public readonly vpc: ec2.Vpc;
 
@@ -61,6 +62,26 @@ export class TailscaleNetworkStack extends cdk.Stack {
         });
 
         this.kmsEndpoint.addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            principals: [new iam.AnyPrincipal()],
+            actions: ['*'],
+            resources: ['*'],
+            conditions: {
+                StringEquals: {
+                    'aws:ResourceAccount': props?.env?.account
+                }
+            }
+        }));
+
+        this.secretsManagerEndpoint = this.vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
+            service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+            privateDnsEnabled: true,
+            subnets: {
+                subnetType: ec2.SubnetType.PRIVATE_ISOLATED
+            }
+        });
+
+        this.secretsManagerEndpoint.addToPolicy(new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
             principals: [new iam.AnyPrincipal()],
             actions: ['*'],
