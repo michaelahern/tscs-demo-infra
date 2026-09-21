@@ -127,8 +127,9 @@ export class TailscaleNetworkStack extends cdk.Stack {
             image: ecs.ContainerImage.fromRegistry('ghcr.io/tailscale/tailscale:latest'),
             environment: {
                 TS_ENABLE_HEALTH_CHECK: 'true',
+                TS_ENABLE_METRICS: 'true',
                 TS_HOSTNAME: `tscs-demo-${this.region}`,
-                TS_ROUTES: '172.24.0.0/16,16.12.60.0/22,16.12.64.0/22,18.34.252.0/22,18.34.72.0/21,3.5.128.0/22,3.5.132.0/23,52.219.141.0/24,52.219.142.0/23,52.219.176.0/22,52.219.212.0/22,52.219.224.0/21,52.219.232.0/22,52.219.80.0/20,52.219.96.0/20'
+                TS_ROUTES: '172.24.0.0/16,16.12.60.0/22,16.12.64.0/22,18.34.252.0/22,18.34.72.0/21,3.5.100.0/22,3.5.104.0/21,3.5.128.0/22,3.5.132.0/23,3.5.88.0/22,3.5.92.0/23,52.219.141.0/24,52.219.142.0/23,52.219.176.0/22,52.219.212.0/22,52.219.224.0/21,52.219.232.0/22,52.219.80.0/20,52.219.96.0/20'
             },
             secrets: {
                 TS_AUTH_KEY: ecs.Secret.fromSecretsManager(secretsmanager.Secret.fromSecretNameV2(this, 'TailscaleAuthKey', 'tailscale/tscs-demo-auth-key'))
